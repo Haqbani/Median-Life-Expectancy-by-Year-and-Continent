@@ -1,0 +1,103 @@
+---
+title: "Analysis of Life Expectancy by Year and Continent"
+author: "Mohammed Al haqbani"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+toc: true
+toc-depth: 2
+css: custom.css
+---
+
+
+# Introduction
+
+This document provides an analysis of median life expectancy changes over time across different continents using the Gapminder dataset. We'll explore data manipulation with `dplyr` and visualization with `ggplot2`.
+
+In this analysis, we've journeyed through the exploration of the Gapminder dataset to understand trends in life expectancy across different continents over several decades. Our findings highlight significant increases in median life expectancy, reflecting global improvements in health care, technology, and living standards. The visualizations created through ggplot2 provide a clear and impactful representation of these trends, showcasing the power of data visualization in storytelling and analysis.
+
+The use of tidyverse tools, particularly `dplyr` and `ggplot2`, demonstrates their utility in managing and displaying complex datasets effectively. This exercise has not only reinforced the importance of thoughtful data analysis in understanding world trends but also the versatility of R in statistical computing and graphics.
+
+## Libraries and Data
+
+First, we load necessary R libraries and the Gapminder data.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(gapminder)
+gap <- gapminder
+```
+
+
+## Data Exploration
+
+```{r}
+glimpse(gap)
+```
+
+
+## Data Summarization
+
+We summarize the data to calculate the median life expectancy, population, and GDP per capita by year and continent.
+
+```{r}
+gap_1 <- gap %>%
+  group_by(year, continent) %>%
+  summarise(
+    med_lifeExp = median(lifeExp),
+    med_pop = median(pop),
+    med_gdpPercap = median(gdpPercap),
+    .groups = 'drop'
+  )
+
+```
+
+## Year Breaks and Labels
+
+We create breaks and labels for the year variable to be used in the visualization.
+
+```{r}
+year_breaks <- seq(1952, 2007, 5)
+year_labels <- c("1952", sapply(year_breaks[-1], function(x) substr(as.character(x), 3, 4)))
+```
+
+## Plotting
+
+Creating a plot of median life expectancy by year and continent.
+
+```{r warning=FALSE}
+ggplot(gap_1, aes(x = year, y = med_lifeExp, color = continent)) +
+  geom_line(size = 1.5) +
+  geom_point(size = 3) +
+  expand_limits(y = 0) +
+  labs(
+    title = "Median Life Expectancy by Year and Continent",
+    subtitle = "Life expectancy has increased over time for all continents",
+    x = "Year",
+    y = "Median Life Expectancy"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 20, face = "bold", family = "Roboto", hjust = 0),
+    legend.position = "bottom",
+    legend.title = element_blank(),
+    axis.title = element_text(size = 14),
+    axis.text.x = element_text(size = 13),
+    axis.text.y = element_text(size = 13),
+    plot.margin = margin(t = 10, r = 10, b = 10, l = 10, unit = "pt")
+  ) +
+  scale_color_brewer(palette = "Set4") +
+  scale_x_continuous(breaks = year_breaks, labels = year_labels) +
+  scale_y_continuous(breaks = seq(0, 90, 10)) +
+  geom_smooth(method = "lm", se = FALSE, aes(group = 1))
+
+```
+
+## Thank you
+
+Thank you for taking the time to explore this analysis with me. I hope it has provided you with valuable insights and enhanced your understanding of data analysis techniques in R. Whether you are a student, a professional, or simply a data enthusiast, I appreciate your interest and engagement.
+
+If you have any questions, suggestions, or comments, please feel free to reach out or contribute to this project. Your feedback is immensely valuable as it helps improve the quality of content and encourages a collaborative and learning environment.
+
+Made with ❤️ by Mohammed Al haqbani
